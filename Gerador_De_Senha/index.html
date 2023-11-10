@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador De Senha</title>
+    <link rel="stylesheet" type="text/css" href="./assets/padrao.css">
+    <link rel="stylesheet" type="text/css" href="./assets/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+
+</head>
+<body>
+    <div class="global">
+        <div class="container">
+            <div class="escopoGerador">
+                <h1 class="escopoTitulo">Gerenciador de Senha</h1>
+                <p class="escopoParagrafo">Utilize o meu gerador online para criar uma senha forte e segura.</p>
+            </div>
+            <div class="containerGerarCodigo">
+                <div class="geradorCodigo">
+                    <input id="geradorSenhaInput" name="" type="text" value="" disabled>
+                    <div class="nivelSeguranca">
+                        <div id="segurancaIndicator" class="indicatorBar critical"></div>
+                    </div>
+                    <div id="statusSenha"><span class="senhaMedia">Senha Média.</span></div>
+                </div>
+                <div class="copyAndReload">
+                    <img onclick="generatePassword()" src="./images/reloadCode.png" alt="" title="">
+                    <img onclick="copyTextInput()" src="./images/copyCode.png" alt="" title="">
+                </div>
+            </div>
+            <div class="containerPerosnalizar">
+                <div class="textpersonalizar">
+                    <h2>Personalize sua senha</h2>
+                </div>
+                <div class="gerenciador">
+                    <div class="rangeSenha">
+                        <label>Tamanho: <span id="tamanhoSenhaSpan">16</span></label>
+                        <input type="range" id="passwordLenght" min="4" max="64" step="1" value="16">
+                    </div>
+                    <div class="checkboxSenha">
+                        <div class="checkBoxPadrao">
+                            <input type="checkbox" id="checLetra" name="checLetra">
+                            <label>Maiúscula</label>
+                        </div>
+                        <div class="checkBoxPadrao">
+                            <input type="checkbox" id="checkNumero" name="checkNumero">
+                            <label>Números</label>
+                        </div>
+                        <div class="checkBoxPadrao">
+                            <input type="checkbox" id="checkSimbolo" name="checkSimbolo">
+                            <label>Simbolos</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="containerButton">
+                <button onclick="copyTextInput()">Copiar Senha</button>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+</body>
+</html>
