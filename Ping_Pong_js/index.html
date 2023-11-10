@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong</title>
+</head>
+<body>
+    <canvas></canvas>
+    <style>
+        * {
+            margin: 0;
+            overflow: hidden;
+            padding: 0;
+            border: unset;
+        }
+    </style>
+</body>
+<script>
+const canvasEl = document.querySelector("canvas");
+const canvasCTx = canvasEl.getContext("2d");
+
+const larguraRaquete = espacamentoRaquete = 15;
+const alturaRaquete = 200;
+const posicaoRaquete = 400;
+
+const mouse = { x: 10, y: 0 };
+let computerSpeed = 5;
+
+const field = {
+    w: window.innerWidth,
+    h: window.innerHeight,
+
+    draw: function () {
+        canvasCTx.fillStyle = "#286047";
+        canvasCTx.fillRect(0, 0, this.w, this.h);
+    },
+};
+
+const line = {
+    w: 7,
+    h: field.h,
+
+    draw: function () {
+        canvasCTx.fillStyle = "#ffffff";
+        canvasCTx.fillRect(field.w / 2, 0, this.w, field.h);
+    },
+};
+
+const leftpaddle = {
+    x: larguraRaquete,
+    y: posicaoRaquete,
+    w: larguraRaquete,
+    h: alturaRaquete,
+
+    _move: function () {
+        this.y = mouse.y - this.h / 2;
+    },
+
+    draw: function () {
+        canvasCTx.fillStyle = "#ffffff";
+        canvasCTx.fillRect(this.x, this.y, this.w, this.h);
+    },
+};
+
+const rightpaddle = {
+    x: field.w - larguraRaquete * 2,
+    y: posicaoRaquete,
+    w: larguraRaquete,
+    h: alturaRaquete,
+    speed: computerSpeed,
+
+    _move: function () {
+        if (this.y + this.h / 2 < ball.y - ball.r) {
+            this.y += this.speed;
+        } else if (this.y + this.h / 2 > ball.y + ball.r) {
+            this.y -= this.speed;
+        }
+
+        if (this.y < 0) {
+            this.y = 0;
+        } else if (this.y + this.h > field.h) {
+            this.y = field.h - this.h;
+        }
+    },
+
+    draw: function () {
+        canvasCTx.fillStyle = "#ffffff";
+        canvasCTx.fillRect(this.x, this.y, this.w, this.h);
+    },
+};
+
+const meuPlacar = {
+    player1: "0",
+    player2: "0",
+    human: 0,
+    computador: 0,
+
+    pontuacao: function () {
+        this.human++;
+        this.player1 = this.human.toString();
+        this.player2 = this.computador.toString();
+        ball._pontUp();
+        computerSpeed += 0.5;
+        rightpaddle.speed = computerSpeed;
+    },
+
+    pontuacaoComputador: function () {
+        this.computador++;
+        this.player1 = this.human.toString();
+        this.player2 = this.computador.toString();
+        ball._pontUp();
+    },
+
+    draw: function () {
+        canvasCTx.font = "bold 74px arial";
+        canvasCTx.textAlign = "center";
+        canvasCTx.textBaseline = "top";
+        canvasCTx.fillStyle = 'red';
+        canvasCTx.fillText(this.player1, field.w / 4, field.h / 10);
+        canvasCTx.fillText(this.player2, field.w / 4 + field.w / 2, field.h / 10);
+    },
+};
+
+const ball = {
+    x: 300,
+    y: 600,
+    r: 15,
+    speed: 5,
+    speedX: 5,
+    speedY: 5,
+
+    _pontUp: function () {
+        this.x = field.w / 2;
+        this.y = field.h / 2;
+        this.speedX = Math.min(Math.abs(this.speedX) * 2, 10) * (this.speedX > 0 ? 1 : -1);
+        this.speedY = Math.min(Math.abs(this.speedY) * 2, 10) * (this.speedY > 0 ? 1 : -1);
+    },
+
+    _calcPosition: function () {
+        if (this.y - this.r < 0 || this.y + this.r > field.h) {
+            this.speedY = -this.speedY;
+        }
+    },
+
+    _calcCollision: function () {
+        if (this.x - this.r < leftpaddle.x + leftpaddle.w &&
+            this.y + this.r > leftpaddle.y &&
+            this.y - this.r < leftpaddle.y + leftpaddle.h) {
+            this.speedX = -this.speedX;
+            this.speedY += (Math.random() - 0.5) * 2;
+        }
+
+        if (this.x + this.r > rightpaddle.x &&
+            this.y + this.r > rightpaddle.y &&
+            this.y - this.r < rightpaddle.y + rightpaddle.h) {
+            this.speedX = -this.speedX;
+            this.speedY += (Math.random() - 0.5) * 2;
+        }
+    },
+
+    _move: function () {
+        this.x += this.speedX;
+        this.y += this.speedY;
+    },
+
+    calcularPlacar: function () {
+        if (this.x > field.w) {
+            meuPlacar.pontuacao();
+        } else if (this.x < 0) {
+            meuPlacar.pontuacaoComputador();
+        }
+    },
+
+    draw: function () {
+        canvasCTx.fillStyle = "#ffffff";
+        canvasCTx.beginPath();
+        canvasCTx.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
+        canvasCTx.fill();
+
+        this._move();
+        this._calcPosition();
+        this._calcCollision();
+        this.calcularPlacar();
+    },
+};
+
+function setup() {
+    canvasEl.width = canvasCTx.width = field.w;
+    canvasEl.height = canvasCTx.height = field.h;
+}
+
+function draw() {
+    field.draw();
+    line.draw();
+    leftpaddle._move();
+    leftpaddle.draw();
+    rightpaddle._move();
+    rightpaddle.draw();
+    meuPlacar.draw();
+    ball.draw();
+}
+
+setup();
+draw();
+
+window.animateFrame = (function () {
+    return (
+        window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (callback) {
+            return window.setTimeout(callback, 1000 / 60);
+        }
+    );
+})();
+
+function main() {
+    animateFrame(main);
+    draw();
+}
+
+setup();
+main();
+
+canvasEl.addEventListener('mousemove', function (e) {
+    mouse.x = e.pageX;
+    mouse.y = e.pageY;
+});
+</script>
+</html>
